@@ -1,5 +1,5 @@
 <template>
-  <header class="header">PEDUCHAT</header>
+  <header class="header"></header>
 </template>
 
 <script setup lang="ts"></script>
