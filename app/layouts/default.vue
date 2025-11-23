@@ -1,11 +1,15 @@
 <template>
-  <div>
-    <h1>PEDUCHAT!</h1>
+  <main class="main">
+    <AppHeader />
     <slot />
-  </div>
+    <AppFooter />
+  </main>
 </template>
 
 <script setup lang="ts">
+import AppFooter from '~/components/layout/AppFooter.vue';
+import AppHeader from '~/components/layout/AppHeader.vue';
+
 useHead({
   title: 'Video Chat',
   meta: [
