@@ -8,4 +8,9 @@ export default defineNuxtConfig({
     process.env.APP_ENV === 'dev' ? '@nuxt/test-utils' : '',
   ],
   css: ['~/assets/css/main.css'],
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
+  },
 });
