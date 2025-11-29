@@ -54,7 +54,14 @@
           class="absolute bottom-4 right-4 w-28 h-40 rounded-lg overflow-hidden bg-gray-800 shadow-lg border-2"
           :class="webrtc.connectionState.value === 'connected' ? 'border-green-500' : 'border-gray-700'"
         >
-          <video ref="localVideoEl" autoplay playsinline muted class="w-full h-full object-cover" />
+          <video
+            ref="localVideoEl"
+            autoplay
+            playsinline
+            muted
+            class="w-full h-full object-cover"
+            style="transform: scaleX(-1)"
+          />
 
           <!-- Video Off Overlay -->
           <div v-if="!isVideoOn" class="absolute inset-0 flex items-center justify-center bg-gray-800">
