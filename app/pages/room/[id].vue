@@ -146,9 +146,9 @@
 </template>
 
 <script setup lang="ts">
-import { useMediaStream } from '~/composables/useMediaStream';
-import { useSignaling } from '~/composables/useSignaling';
-import { useWebRTC } from '~/composables/useWebRTC';
+import { useMediaStream } from '~/features/mediaStream';
+import { useSignaling } from '~/features/signaling';
+import { useWebRTC } from '~/features/webRtc';
 
 const route = useRoute();
 const router = useRouter();
