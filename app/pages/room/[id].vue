@@ -190,7 +190,7 @@ const webrtc = useWebRTC({
       toast.add({
         title: 'Video connected!',
         description: 'You can now see each other',
-        color: 'green',
+        color: 'success',
         icon: 'i-heroicons-video-camera',
       });
     }
@@ -249,7 +249,7 @@ onMounted(async () => {
     toast.add({
       title: 'Connection failed',
       description: 'Could not connect to server',
-      color: 'red',
+      color: 'error',
     });
   }
 });
@@ -279,7 +279,7 @@ function setupWebRTCHandlers() {
         toast.add({
           title: 'Connection error',
           description: 'Failed to initiate video call',
-          color: 'red',
+          color: 'error',
         });
       }
     }
@@ -322,7 +322,7 @@ function setupWebRTCHandlers() {
 
   // When room updates (someone leaves)
   signaling.on('room-update', (data) => {
-    if (data.participants.length < 2) {
+    if (data.participants.length < 1) {
       // Other person left
       hasRemoteVideo.value = false;
       if (remoteVideoEl.value) {
@@ -333,7 +333,7 @@ function setupWebRTCHandlers() {
       toast.add({
         title: 'Participant left',
         description: 'Waiting for someone to join...',
-        color: 'yellow',
+        color: 'info',
       });
     }
   });

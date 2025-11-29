@@ -160,6 +160,7 @@ function handleLeave(peer: any) {
 
       if (room.size === 0) {
         rooms.delete(roomId);
+        console.log(`Room ${roomId} was deleted!`);
       } else {
         updateRoom(roomId);
       }
