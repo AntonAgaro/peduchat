@@ -1,55 +1,65 @@
 // server/routes/_ws.ts
+// WebSocket обработчик для видеочата
 
+// Интерфейс пользователя в комнате
 interface RoomUser {
-  peer: any;
-  name: string;
+  peer: any; // WebSocket соединение пользователя
+  name: string; // Имя пользователя
 }
 
+// Хранилище всех комнат: roomId -> Map(userId -> RoomUser)
+// Каждая комната содержит до 2 пользователей для 1-на-1 видеочата
 const rooms = new Map<string, Map<string, RoomUser>>();
 
 export default defineWebSocketHandler({
+  // Вызывается при новом WebSocket подключении
   open(peer) {
     console.log('✅ Connected:', peer.id);
   },
 
+  // Обработка входящих сообщений от клиента
   message(peer, message) {
     const data = JSON.parse(message.text());
 
+    // Маршрутизация сообщений по типам:
     switch (data.type) {
-      case 'join':
+      case 'join': // Присоединение к комнате
         handleJoin(peer, data);
         break;
 
-      case 'offer':
+      case 'offer': // WebRTC offer для установки соединения
         handleOffer(peer, data);
         break;
 
-      case 'answer':
+      case 'answer': // WebRTC answer в ответ на offer
         handleAnswer(peer, data);
         break;
 
-      case 'ice-candidate':
+      case 'ice-candidate': // ICE кандидаты для NAT traversal
         handleIceCandidate(peer, data);
         break;
     }
   },
 
+  // Вызывается при разрыве соединения
   close(peer) {
     console.log('❌ Disconnected:', peer.id);
     handleLeave(peer);
   },
 });
 
+// Обработка присоединения пользователя к комнате
 function handleJoin(peer: any, data: any) {
   const { roomId, name } = data;
 
+  // Создаем комнату если её еще нет
   if (!rooms.has(roomId)) {
     rooms.set(roomId, new Map());
   }
 
   const room = rooms.get(roomId)!;
 
-  // Check if room is full (max 2 users)
+  // Проверяем лимит - максимум 2 пользователя в комнате
   if (room.size >= 2) {
     peer.send(
       JSON.stringify({
@@ -60,18 +70,20 @@ function handleJoin(peer: any, data: any) {
     return;
   }
 
+  // Добавляем пользователя в комнату
   room.set(peer.id, { peer, name });
   console.log(`👤 ${name} joined ${roomId}. Total: ${room.size}`);
 
+  // Отправляем всем обновление списка участников
   updateRoom(roomId);
 
-  // If there are 2 people, tell them to start WebRTC connection
+  // Если в комнате 2 человека - запускаем процесс установки WebRTC соединения
   if (room.size === 2) {
     const users = Array.from(room.entries());
     const [userId1, user1] = users[0];
     const [userId2, user2] = users[1];
 
-    // Tell user2 (new joiner) to create offer
+    // Новому пользователю (user2) - создать offer
     user2.peer.send(
       JSON.stringify({
         type: 'start-call',
@@ -79,7 +91,7 @@ function handleJoin(peer: any, data: any) {
       })
     );
 
-    // Tell user1 (existing) to wait for offer
+    // Первому пользователю (user1) - ждать offer
     user1.peer.send(
       JSON.stringify({
         type: 'start-call',
@@ -91,12 +103,13 @@ function handleJoin(peer: any, data: any) {
   }
 }
 
+// Пересылка WebRTC offer от одного пользователя другому
 function handleOffer(peer: any, data: any) {
   const { roomId, offer } = data;
   const room = rooms.get(roomId);
 
   if (room) {
-    // Forward offer to the other peer
+    // Находим второго пользователя и отправляем ему offer
     room.forEach((user, id) => {
       if (id !== peer.id) {
         user.peer.send(
@@ -111,12 +124,13 @@ function handleOffer(peer: any, data: any) {
   }
 }
 
+// Пересылка WebRTC answer от одного пользователя другому
 function handleAnswer(peer: any, data: any) {
   const { roomId, answer } = data;
   const room = rooms.get(roomId);
 
   if (room) {
-    // Forward answer to the other peer
+    // Находим второго пользователя и отправляем ему answer
     room.forEach((user, id) => {
       if (id !== peer.id) {
         user.peer.send(
@@ -131,12 +145,13 @@ function handleAnswer(peer: any, data: any) {
   }
 }
 
+// Пересылка ICE кандидатов для установки P2P соединения через NAT
 function handleIceCandidate(peer: any, data: any) {
   const { roomId, candidate } = data;
   const room = rooms.get(roomId);
 
   if (room) {
-    // Forward ICE candidate to the other peer
+    // Пересылаем ICE кандидат второму пользователю
     room.forEach((user, id) => {
       if (id !== peer.id) {
         user.peer.send(
@@ -150,6 +165,7 @@ function handleIceCandidate(peer: any, data: any) {
   }
 }
 
+// Обработка выхода пользователя из комнаты
 function handleLeave(peer: any) {
   rooms.forEach((room, roomId) => {
     if (room.has(peer.id)) {
@@ -158,20 +174,24 @@ function handleLeave(peer: any) {
 
       console.log(`👋 ${userName} left ${roomId}. Remaining: ${room.size}`);
 
+      // Если комната опустела - удаляем её
       if (room.size === 0) {
         rooms.delete(roomId);
         console.log(`Room ${roomId} was deleted!`);
       } else {
+        // Иначе уведомляем оставшихся участников
         updateRoom(roomId);
       }
     }
   });
 }
 
+// Отправка обновления списка участников всем в комнате
 function updateRoom(roomId: string) {
   const room = rooms.get(roomId);
   if (!room) return;
 
+  // Формируем список участников
   const participants = Array.from(room.entries()).map(([id, user]) => ({
     id,
     name: user.name,
@@ -182,6 +202,7 @@ function updateRoom(roomId: string) {
     participants,
   });
 
+  // Рассылаем всем участникам комнаты
   room.forEach((user) => {
     user.peer.send(message);
   });
