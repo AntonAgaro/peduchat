@@ -2,19 +2,39 @@
 // WebSocket обработчик для видеочата
 
 // Интерфейс пользователя в комнате
+import { clearInterval } from 'node:timers';
+import type { Peer } from 'crossws';
 interface RoomUser {
-  peer: any; // WebSocket соединение пользователя
+  peer: Peer; // WebSocket соединение пользователя
   name: string; // Имя пользователя
+  lastPing: number; // Опрос, чтобы сокет не отваливался на клиенте
 }
 
 // Хранилище всех комнат: roomId -> Map(userId -> RoomUser)
 // Каждая комната содержит до 2 пользователей для 1-на-1 видеочата
 const rooms = new Map<string, Map<string, RoomUser>>();
+const pingInterval = 1000;
+const pingTimeout = 60000;
+
+// Проверка мертвых соединений - отрубаем юзера через 60 сек без pong
+setInterval(() => {
+  const now = Date.now();
+  rooms.forEach((room, _) => {
+    room.forEach((user, _) => {
+      if (user.lastPing && now - user.lastPing > pingTimeout) {
+        console.log(`⚠️ ${user.name} timed out (no pong)`);
+        user.peer.close();
+        handleLeave(user.peer);
+      }
+    });
+  });
+}, pingTimeout);
 
 export default defineWebSocketHandler({
   // Вызывается при новом WebSocket подключении
   open(peer) {
     console.log('✅ Connected:', peer.id);
+    startPingInterval(peer);
   },
 
   // Обработка входящих сообщений от клиента
@@ -38,6 +58,8 @@ export default defineWebSocketHandler({
       case 'ice-candidate': // ICE кандидаты для NAT traversal
         handleIceCandidate(peer, data);
         break;
+      case 'pong': // ← Обрабатываем pong, чтобы сокет не отваливался на клиенте
+        handlePong(peer);
     }
   },
 
@@ -48,8 +70,30 @@ export default defineWebSocketHandler({
   },
 });
 
+function startPingInterval(peer: Peer) {
+  peer.pingTimer = setInterval(() => {
+    try {
+      peer.send(JSON.stringify({ type: 'ping' }));
+      console.log(`🏓 Ping sent to ${peer.id}`);
+    } catch (e) {
+      console.error(`❌ Failed to ping ${peer.id}:`, e);
+      handleLeave(peer);
+    }
+  }, pingInterval);
+}
+
+function handlePong(peer: any) {
+  rooms.forEach((room) => {
+    const user = room.get(peer.id);
+    if (user) {
+      user.lastPing = Date.now();
+      console.log(`🏓 Pong received from ${user.name}`);
+    }
+  });
+}
+
 // Обработка присоединения пользователя к комнате
-function handleJoin(peer: any, data: any) {
+function handleJoin(peer: Peer, data: any) {
   const { roomId, name } = data;
 
   // Создаем комнату если её еще нет
@@ -104,7 +148,7 @@ function handleJoin(peer: any, data: any) {
 }
 
 // Пересылка WebRTC offer от одного пользователя другому
-function handleOffer(peer: any, data: any) {
+function handleOffer(peer: Peer, data: any) {
   const { roomId, offer } = data;
   const room = rooms.get(roomId);
 
@@ -146,7 +190,7 @@ function handleAnswer(peer: any, data: any) {
 }
 
 // Пересылка ICE кандидатов для установки P2P соединения через NAT
-function handleIceCandidate(peer: any, data: any) {
+function handleIceCandidate(peer: Peer, data: any) {
   const { roomId, candidate } = data;
   const room = rooms.get(roomId);
 
@@ -166,7 +210,12 @@ function handleIceCandidate(peer: any, data: any) {
 }
 
 // Обработка выхода пользователя из комнаты
-function handleLeave(peer: any) {
+function handleLeave(peer: Peer) {
+  //Чистим ping-pong интервал юзера
+  if (peer.pingTimer) {
+    clearInterval(peer.pingTimer);
+  }
+
   rooms.forEach((room, roomId) => {
     if (room.has(peer.id)) {
       const userName = room.get(peer.id)?.name;

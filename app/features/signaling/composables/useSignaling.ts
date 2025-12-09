@@ -49,6 +49,13 @@ export function useSignaling() {
       // Обработка входящих сообщений
       ws.value.onmessage = (event) => {
         const data = JSON.parse(event.data);
+
+        // Обработка ping
+        if (data.type === 'ping') {
+          console.log('🏓 Ping received, sending pong');
+          send({ type: 'pong' });
+          return;
+        }
         console.log('📨 Received:', data.type);
 
         // Обновляем список участников при получении room-update
