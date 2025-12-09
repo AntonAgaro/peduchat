@@ -9,14 +9,14 @@
 
         <div class="flex flex-col items-center">
           <span class="text-sm text-gray-400">{{ roomId }}</span>
-          <!-- Connection Status -->
+          <!--         Connection Status -->
           <div class="flex items-center gap-2 mt-1">
             <div class="w-2 h-2 rounded-full" :class="signaling.isConnected.value ? 'bg-green-500' : 'bg-red-500'" />
             <span class="text-xs text-gray-500">
               {{ signaling.isConnected.value ? 'Connected' : 'Disconnected' }}
             </span>
           </div>
-          <!-- WebRTC Status -->
+          <!--         WebRTC Status -->
           <div v-if="webrtc.connectionState.value !== 'new'" class="flex items-center gap-2 mt-1">
             <div
               class="w-2 h-2 rounded-full"
@@ -75,42 +75,42 @@
         </div>
 
         <!-- Participants List Overlay (Top Left) -->
-        <div class="absolute top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg p-3 max-w-xs">
-          <div class="flex items-center gap-2 mb-2">
-            <UIcon name="i-heroicons-users" class="text-gray-400" />
-            <span class="text-sm font-medium text-white">
-              Participants ({{ signaling.participants.value.length }})
-            </span>
-          </div>
+        <!--        <div class="absolute top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg p-3 max-w-xs">-->
+        <!--          <div class="flex items-center gap-2 mb-2">-->
+        <!--            <UIcon name="i-heroicons-users" class="text-gray-400" />-->
+        <!--            <span class="text-sm font-medium text-white">-->
+        <!--              Participants ({{ signaling.participants.value.length }})-->
+        <!--            </span>-->
+        <!--          </div>-->
 
-          <div v-if="signaling.participants.value.length > 0" class="space-y-2">
-            <div
-              v-for="participant in signaling.participants.value"
-              :key="participant.id"
-              class="flex items-center gap-2"
-            >
-              <div class="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <span class="text-primary text-xs font-bold">
-                  {{ participant.name.charAt(0).toUpperCase() }}
-                </span>
-              </div>
-              <span class="text-sm text-white truncate">
-                {{ participant.name }}
-              </span>
-              <span v-if="participant.name === userName" class="text-xs text-gray-500 ml-auto"> (You) </span>
-            </div>
-          </div>
+        <!--          <div v-if="signaling.participants.value.length > 0" class="space-y-2">-->
+        <!--            <div-->
+        <!--              v-for="participant in signaling.participants.value"-->
+        <!--              :key="participant.id"-->
+        <!--              class="flex items-center gap-2"-->
+        <!--            >-->
+        <!--              <div class="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">-->
+        <!--                <span class="text-primary text-xs font-bold">-->
+        <!--                  {{ participant.name.charAt(0).toUpperCase() }}-->
+        <!--                </span>-->
+        <!--              </div>-->
+        <!--              <span class="text-sm text-white truncate">-->
+        <!--                {{ participant.name }}-->
+        <!--              </span>-->
+        <!--              <span v-if="participant.name === userName" class="text-xs text-gray-500 ml-auto"> (You) </span>-->
+        <!--            </div>-->
+        <!--          </div>-->
 
-          <div v-else class="text-xs text-gray-500 text-center py-2">No one here yet</div>
-        </div>
+        <!--          <div v-else class="text-xs text-gray-500 text-center py-2">No one here yet</div>-->
+        <!--        </div>-->
 
         <!-- Waiting Overlay -->
         <div v-if="!hasOtherParticipants" class="absolute inset-0 flex items-center justify-center bg-gray-900/80">
           <div class="text-center">
             <UIcon name="i-heroicons-user-plus" class="text-5xl mb-4 text-gray-500" />
-            <p class="text-gray-400 mb-2">Waiting for someone to join...</p>
-            <p class="text-gray-500 text-sm mb-4">Share the link to invite</p>
-            <UButton size="sm" variant="soft" @click="shareRoom"> Share Link </UButton>
+            <div class="text-gray-400 mb-2">Ждем остальных участников</div>
+            <div class="text-gray-500 text-sm mb-4">Поделитесь ссылкой на комнату</div>
+            <UButton size="sm" variant="soft" @click="shareRoom">Поделиться</UButton>
           </div>
         </div>
 

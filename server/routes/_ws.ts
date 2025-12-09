@@ -13,7 +13,7 @@ interface RoomUser {
 // Хранилище всех комнат: roomId -> Map(userId -> RoomUser)
 // Каждая комната содержит до 2 пользователей для 1-на-1 видеочата
 const rooms = new Map<string, Map<string, RoomUser>>();
-const pingInterval = 1000;
+const pingInterval = 30000;
 const pingTimeout = 60000;
 
 // Проверка мертвых соединений - отрубаем юзера через 60 сек без pong
