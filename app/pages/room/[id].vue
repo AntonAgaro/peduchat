@@ -187,12 +187,12 @@ const webrtc = useWebRTC({
       remoteVideoEl.value.srcObject = stream;
       hasRemoteVideo.value = true;
 
-      toast.add({
-        title: 'Video connected!',
-        description: 'You can now see each other',
-        color: 'success',
-        icon: 'i-heroicons-video-camera',
-      });
+      // toast.add({
+      //   title: 'Video connected!',
+      //   description: 'You can now see each other',
+      //   color: 'success',
+      //   icon: 'i-heroicons-video-camera',
+      // });
     }
 
     // Check for video tracks
@@ -239,11 +239,11 @@ onMounted(async () => {
     signaling.joinRoom(roomId, userName.value);
     hasJoined.value = true;
 
-    toast.add({
-      title: 'Connected',
-      description: `Joined room as ${userName.value}`,
-      icon: 'i-heroicons-check-circle',
-    });
+    // toast.add({
+    //   title: 'Connected',
+    //   description: `Joined room as ${userName.value}`,
+    //   icon: 'i-heroicons-check-circle',
+    // });
   } catch (error) {
     console.error('❌ Failed to connect:', error);
     toast.add({
@@ -369,11 +369,11 @@ async function shareRoom() {
     }
   } else {
     await navigator.clipboard.writeText(url);
-    toast.add({
-      title: 'Link copied!',
-      description: 'Share this link to invite others',
-      icon: 'i-heroicons-clipboard-document-check',
-    });
+    // toast.add({
+    //   title: 'Link copied!',
+    //   description: 'Share this link to invite others',
+    //   icon: 'i-heroicons-clipboard-document-check',
+    // });
   }
 }
 
