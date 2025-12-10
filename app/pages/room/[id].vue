@@ -4,35 +4,35 @@
     <!-- Call Screen -->
     <div class="flex flex-col h-full">
       <!-- Header -->
-      <div class="flex items-center justify-between p-4 bg-gray-900">
-        <UButton variant="ghost" icon="i-heroicons-arrow-left" @click="leaveCall" />
+      <!--      <div class="flex items-center justify-between p-4 bg-gray-900">-->
+      <!--        <UButton variant="ghost" icon="i-heroicons-arrow-left" @click="leaveCall" />-->
 
-        <div class="flex flex-col items-center">
-          <span class="text-sm text-gray-400">{{ roomId }}</span>
-          <!--         Connection Status -->
-          <div class="flex items-center gap-2 mt-1">
-            <div class="w-2 h-2 rounded-full" :class="signaling.isConnected.value ? 'bg-green-500' : 'bg-red-500'" />
-            <span class="text-xs text-gray-500">
-              {{ signaling.isConnected.value ? 'Connected' : 'Disconnected' }}
-            </span>
-          </div>
-          <!--         WebRTC Status -->
-          <div v-if="webrtc.connectionState.value !== 'new'" class="flex items-center gap-2 mt-1">
-            <div
-              class="w-2 h-2 rounded-full"
-              :class="{
-                'bg-yellow-500': webrtc.connectionState.value === 'connecting',
-                'bg-green-500': webrtc.connectionState.value === 'connected',
-                'bg-red-500':
-                  webrtc.connectionState.value === 'failed' || webrtc.connectionState.value === 'disconnected',
-              }"
-            />
-            <span class="text-xs text-gray-500"> Video: {{ webrtc.connectionState.value }} </span>
-          </div>
-        </div>
+      <!--        <div class="flex flex-col items-center">-->
+      <!--          <span class="text-sm text-gray-400">{{ roomId }}</span>-->
+      <!--          &lt;!&ndash;         Connection Status &ndash;&gt;-->
+      <!--          <div class="flex items-center gap-2 mt-1">-->
+      <!--            <div class="w-2 h-2 rounded-full" :class="signaling.isConnected.value ? 'bg-green-500' : 'bg-red-500'" />-->
+      <!--            <span class="text-xs text-gray-500">-->
+      <!--              {{ signaling.isConnected.value ? 'Connected' : 'Disconnected' }}-->
+      <!--            </span>-->
+      <!--          </div>-->
+      <!--          &lt;!&ndash;         WebRTC Status &ndash;&gt;-->
+      <!--          <div v-if="webrtc.connectionState.value !== 'new'" class="flex items-center gap-2 mt-1">-->
+      <!--            <div-->
+      <!--              class="w-2 h-2 rounded-full"-->
+      <!--              :class="{-->
+      <!--                'bg-yellow-500': webrtc.connectionState.value === 'connecting',-->
+      <!--                'bg-green-500': webrtc.connectionState.value === 'connected',-->
+      <!--                'bg-red-500':-->
+      <!--                  webrtc.connectionState.value === 'failed' || webrtc.connectionState.value === 'disconnected',-->
+      <!--              }"-->
+      <!--            />-->
+      <!--            <span class="text-xs text-gray-500"> Video: {{ webrtc.connectionState.value }} </span>-->
+      <!--          </div>-->
+      <!--        </div>-->
 
-        <UButton variant="ghost" icon="i-heroicons-share" @click="shareRoom" />
-      </div>
+      <!--        <UButton variant="ghost" icon="i-heroicons-share" @click="shareRoom" />-->
+      <!--      </div>-->
 
       <!-- Video Area -->
       <div class="flex-1 relative bg-black">
@@ -51,7 +51,7 @@
 
         <!-- Local Video -->
         <div
-          class="absolute bottom-4 right-4 w-28 h-40 rounded-lg overflow-hidden bg-gray-800 shadow-lg border-2"
+          class="absolute bottom-2 right-2 w-20 h-30 rounded-lg overflow-hidden bg-gray-800 shadow-lg border-2"
           :class="webrtc.connectionState.value === 'connected' ? 'border-green-500' : 'border-gray-700'"
         >
           <video

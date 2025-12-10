@@ -8,3 +8,8 @@ html, body, #__nuxt, .main {
 body {
     background-color: #0f172a;
 }
+
+.container {
+    max-width: 1080px;
+    margin: 0 auto;
+}
