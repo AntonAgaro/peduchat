@@ -85,6 +85,19 @@ export function useWebRTC(options: UseWebRTCOptions) {
     await peerConnection.value.addIceCandidate(candidate);
   }
 
+  async function replaceVideoTrack(newTrack: MediaStreamTrack) {
+    if (!peerConnection.value) return;
+
+    const senders = peerConnection.value.getSenders();
+    const videoSender = senders.find((sender) => sender.track?.kind === 'video');
+
+    if (videoSender) {
+      console.log('[WebRTC] Replacing video track');
+      await videoSender.replaceTrack(newTrack);
+      console.log('[WebRTC] ✅ Video track replaced');
+    }
+  }
+
   function close() {
     if (peerConnection.value) {
       peerConnection.value.close();
@@ -105,6 +118,7 @@ export function useWebRTC(options: UseWebRTCOptions) {
     createAnswer,
     setRemoteDescription,
     addIceCandidate,
+    replaceVideoTrack,
     close,
   };
 }

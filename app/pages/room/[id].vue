@@ -266,7 +266,26 @@ onMounted(async () => {
 });
 
 async function handleSwitchCamera() {
-  await switchCamera();
+  try {
+    const newVideoTrack = await switchCamera();
+
+    if (newVideoTrack && webrtc.peerConnection.value) {
+      // Replace the track in the WebRTC connection
+      await webrtc.replaceVideoTrack(newVideoTrack);
+
+      // Update local video element
+      if (localVideoEl.value && localStream.value) {
+        localVideoEl.value.srcObject = localStream.value;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to switch camera:', err);
+    toast.add({
+      title: 'Camera switch failed',
+      description: 'Could not switch camera',
+      color: 'error',
+    });
+  }
 }
 
 function setupWebRTCHandlers() {
