@@ -37,7 +37,7 @@
       <!-- Video Area -->
       <div class="flex-1 relative bg-black">
         <!-- Remote Video -->
-        <video ref="remoteVideoEl" autoplay playsinline class="w-full h-full object-cover" />
+        <video ref="remoteVideoEl" autoplay playsinline class="w-full h-full object-contain" />
 
         <!-- Remote Video Placeholder -->
         <div v-if="!hasRemoteVideo" class="absolute inset-0 flex items-center justify-center bg-gray-900">
