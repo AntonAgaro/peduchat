@@ -1,6 +1,6 @@
 <!-- pages/room/[id].vue -->
 <template>
-  <div class="h-screen">
+  <div class="h-full">
     <!-- Call Screen -->
     <div class="flex flex-col h-full">
       <!-- Header -->
@@ -132,7 +132,7 @@
           :color="!isAudiOn ? 'error' : 'neutral'"
           variant="soft"
           size="xl"
-          :icon="!isAudiOn ? 'i-heroicons-microphone-slash' : 'i-heroicons-microphone'"
+          :icon="!isAudiOn ? 'i-mdi-microphone-off' : 'i-heroicons-microphone'"
           class="rounded-full"
           @click="toggleAudio"
         />
@@ -147,6 +147,16 @@
           class="rounded-full"
           @click="toggleVideo"
         />
+
+        <UButton
+          v-if="useDevice().isMobile.value"
+          :color="'neutral'"
+          variant="soft"
+          size="xl"
+          :icon="'i-material-symbols-light:flip-camera-ios-outline'"
+          class="rounded-full"
+          @click="handleSwitchCamera"
+        />
       </footer>
     </div>
   </div>
@@ -156,6 +166,7 @@
 import { useMediaStream } from '~/features/mediaStream';
 import { useSignaling } from '~/features/signaling';
 import { useWebRTC } from '~/features/webRtc';
+import { useDevice } from '~/shared/ui/composables/useDevice';
 
 const route = useRoute();
 const router = useRouter();
@@ -253,6 +264,10 @@ onMounted(async () => {
     });
   }
 });
+
+async function handleSwitchCamera() {
+  await switchCamera();
+}
 
 function setupWebRTCHandlers() {
   // When server tells us to start the call

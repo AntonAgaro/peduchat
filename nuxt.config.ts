@@ -39,4 +39,9 @@ export default defineNuxtConfig({
       ],
     },
   },
+  //Для теста на локалхосте
+  // devServer: {
+  //   host: '0.0.0.0',
+  //   https: true,
+  // },
 });
