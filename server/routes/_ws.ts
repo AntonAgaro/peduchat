@@ -4,15 +4,8 @@
 // Интерфейс пользователя в комнате
 import { clearInterval } from 'node:timers';
 import type { Peer } from 'crossws';
-interface RoomUser {
-  peer: Peer; // WebSocket соединение пользователя
-  name: string; // Имя пользователя
-  lastPing: number; // Опрос, чтобы сокет не отваливался на клиенте
-}
+import { rooms } from '~~/server/state';
 
-// Хранилище всех комнат: roomId -> Map(userId -> RoomUser)
-// Каждая комната содержит до 2 пользователей для 1-на-1 видеочата
-const rooms = new Map<string, Map<string, RoomUser>>();
 const pingInterval = 30000;
 const pingTimeout = 60000;
 

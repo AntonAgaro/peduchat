@@ -405,8 +405,8 @@ async function shareRoom() {
   if (navigator.share) {
     try {
       await navigator.share({
-        title: 'Join my video call',
-        text: `${userName.value} is inviting you to a video call`,
+        // title: 'Join my video call',
+        // text: `${userName.value} is inviting you to a video call`,
         url,
       });
     } catch (err) {
