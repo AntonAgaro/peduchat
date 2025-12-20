@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   modules: [
     process.env.APP_ENV === 'dev' ? '@nuxt/eslint' : '',
     '@nuxt/ui',
+    '@vite-pwa/nuxt',
     process.env.APP_ENV === 'dev' ? '@nuxt/test-utils' : '',
   ],
   css: ['~/assets/css/main.css'],
@@ -16,6 +17,25 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { swr: 60 * 5 },
     '/room/**': { ssr: false },
+  },
+  pwa: {
+    manifest: {
+      name: 'PeduChat',
+      short_name: 'PeduChat',
+      description: 'Видеочат без регистрации',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#000000',
+      theme_color: '#667EEA',
+      icons: [
+        { src: '/icons/192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icons/512.png', sizes: '512x512', type: 'image/png' },
+      ],
+    },
+    workbox: {
+      // кеширование ассетов
+      globPatterns: ['**/*.{js,css,html,png,svg}'],
+    },
   },
   app: {
     head: {
