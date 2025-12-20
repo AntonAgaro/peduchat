@@ -6,10 +6,53 @@ html, body, #__nuxt, .main {
 }
 
 body {
-    background-color: #0f172a;
+    background: var(--ui-bg-gradient);
+}
+
+.main {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
 }
 
 .container {
     max-width: 1080px;
     margin: 0 auto;
+}
+
+:root {
+    /* ---- Semantic Colors ---- */
+    --ui-primary: #667EEA;              /* фиолетовый */
+    --ui-secondary: #8E8EA9;            /* серо-фиолетовый */
+    --ui-success: #52D681;              /* зелёный */
+    --ui-info: #4FACFE;                 /* голубой */
+    --ui-warning: #FFC542;              /* жёлтый */
+    --ui-error: #FF6B9D;                /* розовый */
+    --ui-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    /* ---- Text Colors ---- */
+    --ui-text-dimmed: #6E6E7E;          /* самый тусклый */
+    --ui-text-muted: #8E8EA9;           /* приглушённый */
+    --ui-text-toned: #A8A8C0;           /* средний */
+    --ui-text: #B8B8D1;                 /* основной текст */
+    --ui-text-highlighted: #FFFFFF;     /* яркий/заголовки */
+    --ui-text-inverted: #1A1A2E;        /* инвертированный */
+
+    /* ---- Background Colors ---- */
+    --ui-bg: #1A1A2E;                   /* основной фон */
+    --ui-bg-muted: #16213E;             /* карточки, панели */
+    --ui-bg-elevated: #1E2749;          /* поднятые элементы */
+    --ui-bg-accented: #0F3460;          /* акцентные области */
+    --ui-bg-inverted: #FFFFFF;          /* инвертированный */
+    --ui-bg-gradient: linear-gradient(rgb(26, 26, 46) 0%, rgb(22, 33, 62) 50%, rgb(15, 52, 96) 100%);
+
+    /* ---- Border Colors ---- */
+    --ui-border: #2D3561;               /* основная граница */
+    --ui-border-muted: #252E5C;         /* тусклая граница */
+    --ui-border-accented: #3D4575;      /* акцентная граница */
+    --ui-border-inverted: #FFFFFF;      /* инвертированная */
 }

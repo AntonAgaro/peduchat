@@ -1,0 +1,14 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667EEA" />
+      <stop offset="100%" stop-color="#764BA2" />
+    </linearGradient>
+  </defs>
+  <!-- Пузырь чата -->
+  <path d="M50 5C25 5 5 25 5 50C5 75 25 95 50 95C55 95 65 93 65 93L85 98L80 80C90 72 95 62 95 50C95 25 75 5 50 5Z" fill="url(#gradient)" />
+  <!-- Корпус камеры -->
+  <rect x="25" y="35" width="30" height="30" rx="6" fill="white" />
+  <!-- Объектив -->
+  <path d="M55 42L72 32V68L55 58V42Z" fill="white" />
+</svg>
