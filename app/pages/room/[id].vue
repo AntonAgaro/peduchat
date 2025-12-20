@@ -113,11 +113,24 @@
 
         <!-- Waiting Overlay -->
         <div v-if="!hasOtherParticipants" class="absolute inset-0 flex items-center justify-center bg-gray-900/80">
-          <div class="text-center">
+          <div class="flex flex-col items-center">
             <UIcon name="i-heroicons-user-plus" class="text-5xl mb-4 text-gray-500" />
-            <div class="text-gray-400 mb-2">Ждем остальных участников</div>
-            <div class="text-gray-500 text-sm mb-4">Поделитесь ссылкой на комнату</div>
-            <UButton size="sm" variant="soft" @click="shareRoom">Поделиться</UButton>
+            <div class="text-white mb-4">Ждем остальных участников</div>
+            <div class="text-white text-sm mb-8">
+              Id комнаты: <span class="text-2xl font-bold" :style="{ color: 'var(--ui-success)' }">{{ roomId }}</span>
+            </div>
+            <button
+              class="mb-8 cursor-pointer btn-cta px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-3 min-w-[220px] justify-center text-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-transform duration-200"
+              :style="{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                boxShadow: '0 0 20px #667EEA80',
+              }"
+              @click="shareRoom"
+            >
+              Поделиться
+            </button>
+            <!--            <UButton size="sm" variant="soft" @click="shareRoom">Поделиться</UButton>-->
           </div>
         </div>
 
