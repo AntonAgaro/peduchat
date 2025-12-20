@@ -175,6 +175,10 @@ import { useSignaling } from '~/features/signaling';
 import { useWebRTC } from '~/features/webRtc';
 import { useDevice } from '~/shared/ui/composables/useDevice';
 
+useHead({
+  meta: [{ name: 'robots', content: 'noindex, nofollow' }],
+});
+
 definePageMeta({
   layout: 'video-room',
 });

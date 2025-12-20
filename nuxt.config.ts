@@ -13,6 +13,10 @@ export default defineNuxtConfig({
       websocket: true,
     },
   },
+  routeRules: {
+    '/': { swr: 60 * 5 },
+    '/room/**': { ssr: false },
+  },
   app: {
     head: {
       link: [
@@ -21,6 +25,17 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
       ],
       script: [
+        {
+          type: 'application/ld+json',
+          innerHTML: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'PeduChat - бесплатный видеочат без регистрации',
+            applicationCategory: 'CommunicationApplication',
+            operatingSystem: 'Web',
+            description: 'Бесплатный видеочат без регистрации для быстрых онлайн встреч',
+          }),
+        },
         {
           innerHTML: `
             
@@ -35,6 +50,18 @@ export default defineNuxtConfig({
             
             `,
           type: 'text/javascript',
+        },
+        {
+          src: 'https://www.googletagmanager.com/gtag/js?id=G-1EXFQZ4D29',
+          async: true,
+        },
+        {
+          innerHTML: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-1EXFQZ4D29');
+          `,
         },
       ],
       noscript: [

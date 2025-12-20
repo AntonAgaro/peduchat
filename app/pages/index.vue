@@ -46,6 +46,16 @@
 import type { FormError } from '@nuxt/ui';
 import { ROOM_ID_REGEX, ROOM_URL_REGEX } from '~~/shared/constants';
 
+useHead({
+  title: 'PeduChat - бесплатный видеочат без регистрации',
+  meta: [
+    {
+      name: 'description',
+      content: 'Общайтесь по видео бесплатно. Без регистрации. Работает в браузере.',
+    },
+  ],
+});
+
 const formState = reactive({
   roomCredentials: '',
 });
