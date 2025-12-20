@@ -1,5 +1,8 @@
 <template>
-  <footer class="footer">Приложение для личных и семейных нужд</footer>
+  <footer class="footer">
+    <div>© 2025 PeduChat All rights reserved.</div>
+    Приложение предназначено для личных и семейных нужд
+  </footer>
 </template>
 
 <script setup lang="ts"></script>
@@ -8,5 +11,6 @@
 .footer {
   padding: 24px;
   min-height: 56px;
+  font-size: 8px;
 }
 </style>

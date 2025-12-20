@@ -35,14 +35,16 @@
       <!--      </div>-->
 
       <!-- Video Area -->
-      <div class="flex-1 relative bg-black">
-        <!-- Remote Video -->
-        <video
-          ref="remoteVideoEl"
-          autoplay
-          playsinline
-          class="w-full h-full max-w-[600px] mt-0 mb-0 mr-auto ml-auto object-cover"
-        />
+      <div class="flex-1 w-full h-full relative bg-black flex items-center justify-center">
+        <!--        Remote Video-->
+        <!--        <video-->
+        <!--          ref="remoteVideoEl"-->
+        <!--          autoplay-->
+        <!--          playsinline-->
+        <!--          class="w-full h-full max-w-[600px] mt-0 mb-0 mr-auto ml-auto object-cover"-->
+        <!--        />-->
+
+        <video ref="remoteVideoEl" autoplay playsinline class="video-remote" />
 
         <!-- Remote Video Placeholder -->
         <div v-if="!hasRemoteVideo" class="absolute inset-0 flex items-center justify-center bg-gray-900">
@@ -172,6 +174,10 @@ import { useMediaStream } from '~/features/mediaStream';
 import { useSignaling } from '~/features/signaling';
 import { useWebRTC } from '~/features/webRtc';
 import { useDevice } from '~/shared/ui/composables/useDevice';
+
+definePageMeta({
+  layout: 'video-room',
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -425,3 +431,30 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<style scoped>
+.video-remote {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: black;
+
+  @media (min-width: 769px) {
+    width: auto;
+    height: 100%;
+    max-width: min(100%, 1280px);
+    max-height: min(100%, 720px); /* 16:9 */
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  /* =========================
+     Ultra-wide / большие экраны
+     ========================= */
+  @media (min-width: 1440px) {
+    max-width: 1440px;
+    max-height: 810px; /* 16:9 */
+  }
+}
+</style>
