@@ -22,7 +22,7 @@ export function useWebRTC(options: UseWebRTCOptions) {
   const iceConnectionState = ref<RTCIceConnectionState>('new');
 
   // TURN fallback state
-  const useTurn = ref(false);
+  const useTurn = ref(true);
   const turnCredentials = ref<ICEConfig | null>(null);
   const connectionAttempt = ref(0);
   const maxAttemptsBeforeTurn = 1;
