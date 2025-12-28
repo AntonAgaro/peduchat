@@ -2,7 +2,7 @@
 @import "@nuxt/ui";
 
 html, body, #__nuxt, .main {
-    height: 100%;
+    height: 100dvh;
 }
 
 body {
