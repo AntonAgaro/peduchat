@@ -24,6 +24,47 @@ export function useWebRTC(options: UseWebRTCOptions) {
       }
     };
 
+    // pc.onicecandidateerror = (event) => {
+    //   console.error('[ICE] Candidate error:', {
+    //     errorCode: event.errorCode,
+    //     errorText: event.errorText,
+    //     url: event.url,
+    //     hostCandidate: event.hostCandidate ?? '',
+    //   });
+    //
+    //   alert(
+    //     JSON.stringify({
+    //       errorCode: event.errorCode,
+    //       errorText: event.errorText,
+    //       url: event.url,
+    //       hostCandidate: event.hostCandidate ?? '',
+    //     })
+    //   );
+    // };
+
+    // Состояние соединения — ГЛАВНЫЙ индикатор
+    pc.oniceconnectionstatechange = () => {
+      const state = pc.iceConnectionState;
+
+      // console.log(`[ICE] State: ${state}`);
+
+      switch (state) {
+        case 'connected':
+        case 'completed':
+          console.log('[ICE] ✅ Connection successful!');
+          break;
+
+        case 'failed':
+          alert('[ICE] ❌ Connection FAILED');
+
+          break;
+
+        case 'disconnected':
+          alert('[ICE] ⚠️ Disconnected (may recover)');
+          break;
+      }
+    };
+
     // Connection state changes
     pc.onconnectionstatechange = () => {
       console.log('[WebRTC] Connection state:', pc.connectionState);
