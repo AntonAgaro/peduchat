@@ -244,6 +244,11 @@ const webrtc = useWebRTC({
   onIceCandidate: (candidate) => {
     signaling.sendIceCandidate(roomId, candidate);
   },
+
+  onNeedReconnect: async () => {
+    // Переподключаемся с TURN
+    await reconnect();
+  },
 });
 
 // Computed
@@ -272,7 +277,7 @@ onMounted(async () => {
     console.log('✅ Connected to signaling server');
 
     // 3. Setup WebRTC handlers
-    setupWebRTCHandlers();
+    await setupWebRTCHandlers();
 
     // 4. Join room
     signaling.joinRoom(roomId, userName.value);
@@ -292,6 +297,22 @@ onMounted(async () => {
     });
   }
 });
+
+async function reconnect() {
+  // Пересоздаём соединение с TURN
+  await webrtc.reconnectWithTurn();
+
+  // Добавляем локальный стрим заново
+  if (localStream.value) {
+    webrtc.addLocalStream(localStream.value);
+  }
+
+  // Отправляем новый offer
+  const offer = await webrtc.createOffer();
+  if (offer) {
+    signaling.sendOffer(roomId, offer);
+  }
+}
 
 async function handleSwitchCamera() {
   try {
@@ -316,13 +337,13 @@ async function handleSwitchCamera() {
   }
 }
 
-function setupWebRTCHandlers() {
+async function setupWebRTCHandlers() {
   // When server tells us to start the call
   signaling.on('start-call', async (data) => {
     console.log('🎬 Starting call, isInitiator:', data.isInitiator);
 
     // Create peer connection
-    webrtc.createConnection();
+    await webrtc.createConnection();
 
     // Add our local stream
     if (localStream.value) {

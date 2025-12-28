@@ -1,50 +1,77 @@
 // composables/useWebRTC.ts
 
-const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
+interface ICEConfig {
+  iceServers: RTCIceServer[];
+  expiresAt?: number;
+}
 
 interface UseWebRTCOptions {
   onRemoteStream: (stream: MediaStream) => void;
   onIceCandidate: (candidate: RTCIceCandidate) => void;
+  onNeedReconnect?: () => void; // Вызывается когда нужен ICE restart с TURN
 }
+
+// Базовый конфиг — только STUN
+const StunOnlyConfig: ICEConfig = {
+  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }],
+};
 
 export function useWebRTC(options: UseWebRTCOptions) {
   const peerConnection = ref<RTCPeerConnection | null>(null);
   const connectionState = ref('new');
+  const iceConnectionState = ref<RTCIceConnectionState>('new');
 
-  function createConnection() {
-    console.log('[WebRTC] Creating peer connection');
+  // TURN fallback state
+  const useTurn = ref(false);
+  const turnCredentials = ref<ICEConfig | null>(null);
+  const connectionAttempt = ref(0);
+  const maxAttemptsBeforeTurn = 1;
 
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  async function getIceConfig(): Promise<RTCConfiguration> {
+    if (useTurn.value) {
+      turnCredentials.value = await $fetch<ICEConfig>('/api/get-turn-credentials');
+      return {
+        iceServers: turnCredentials.value.iceServers,
+        iceCandidatePoolSize: 10,
+      };
+    }
+
+    return {
+      iceServers: StunOnlyConfig.iceServers,
+      iceCandidatePoolSize: 10,
+    };
+  }
+
+  async function createConnection() {
+    console.log('[WebRTC] Creating peer connection', {
+      attempt: connectionAttempt.value + 1,
+      useTurn: useTurn.value,
+    });
+
+    const config = await getIceConfig();
+
+    console.log('[WebRTC] ICE servers:', config.iceServers?.length, {
+      hasTurn: config.iceServers?.some((s) =>
+        Array.isArray(s.urls) ? s.urls.some((u) => u.startsWith('turn')) : s.urls?.startsWith('turn')
+      ),
+    });
+
+    const pc = new RTCPeerConnection(config);
 
     // When we get ICE candidates
     pc.onicecandidate = (event) => {
       if (event.candidate) {
-        console.log('[WebRTC] 🧊 Got ICE candidate');
+        const type = event.candidate.type || 'unknown';
+        console.log(`[WebRTC] 🧊 ICE candidate: ${type}`);
         options.onIceCandidate(event.candidate);
       }
     };
 
-    // pc.onicecandidateerror = (event) => {
-    //   console.error('[ICE] Candidate error:', {
-    //     errorCode: event.errorCode,
-    //     errorText: event.errorText,
-    //     url: event.url,
-    //     hostCandidate: event.hostCandidate ?? '',
-    //   });
-    //
-    //   alert(
-    //     JSON.stringify({
-    //       errorCode: event.errorCode,
-    //       errorText: event.errorText,
-    //       url: event.url,
-    //       hostCandidate: event.hostCandidate ?? '',
-    //     })
-    //   );
-    // };
-
-    // Состояние соединения — ГЛАВНЫЙ индикатор
+    // Состояние соединения
     pc.oniceconnectionstatechange = () => {
       const state = pc.iceConnectionState;
+      iceConnectionState.value = state;
+      console.log(`[WebRTC] ICE state: ${state}`);
 
       // console.log(`[ICE] State: ${state}`);
 
@@ -52,10 +79,12 @@ export function useWebRTC(options: UseWebRTCOptions) {
         case 'connected':
         case 'completed':
           console.log('[ICE] ✅ Connection successful!');
+          connectionAttempt.value = 0; // Сбрасываем счётчик
           break;
 
         case 'failed':
-          alert('[ICE] ❌ Connection FAILED');
+          // alert('[ICE] ❌ Connection FAILED');
+          handleConnectionFailed();
 
           break;
 
@@ -81,6 +110,55 @@ export function useWebRTC(options: UseWebRTCOptions) {
 
     peerConnection.value = pc;
     return pc;
+  }
+
+  function handleConnectionFailed() {
+    connectionAttempt.value++;
+    console.error(`[WebRTC] ❌ Connection failed (attempt ${connectionAttempt.value})`);
+
+    if (!useTurn.value && connectionAttempt.value <= maxAttemptsBeforeTurn) {
+      // Пробуем с TURN
+      console.log('[WebRTC] 🔄 Enabling TURN fallback...');
+      useTurn.value = true;
+
+      // Уведомляем о необходимости переподключения
+      if (options.onNeedReconnect) {
+        options.onNeedReconnect();
+      } else {
+        // Если callback не передан — показываем alert
+        alert(
+          '⚠️ Прямое соединение не удалось.\n\n' + 'Переподключение через TURN сервер...\n' + 'Пожалуйста, подождите.'
+        );
+      }
+    } else {
+      // Даже с TURN не работает
+      alert(
+        '❌ Не удалось установить соединение.\n\n' +
+          'Попробуйте:\n' +
+          '• Обновить страницу\n' +
+          '• Переключиться на другую сеть\n' +
+          '• Отключить VPN'
+      );
+    }
+  }
+
+  /**
+   * Пересоздаёт соединение с TURN
+   */
+  async function reconnectWithTurn() {
+    console.log('[WebRTC] Reconnecting with TURN...');
+
+    // Закрываем старое соединение
+    if (peerConnection.value) {
+      peerConnection.value.close();
+      peerConnection.value = null;
+    }
+
+    // Включаем TURN
+    useTurn.value = true;
+
+    // Создаём новое соединение
+    return await createConnection();
   }
 
   function addLocalStream(stream: MediaStream) {
@@ -146,14 +224,32 @@ export function useWebRTC(options: UseWebRTCOptions) {
     }
   }
 
+  /**
+   * Полный сброс состояния (для нового звонка)
+   */
+  function reset() {
+    close();
+    useTurn.value = false;
+    connectionAttempt.value = 0;
+    turnCredentials.value = null;
+    connectionState.value = 'new';
+    iceConnectionState.value = 'new';
+  }
+
   onUnmounted(() => {
     close();
   });
 
   return {
+    // State
     peerConnection,
     connectionState,
+    iceConnectionState,
+    useTurn: readonly(useTurn),
+
+    // Methods
     createConnection,
+    reconnectWithTurn,
     addLocalStream,
     createOffer,
     createAnswer,
@@ -161,5 +257,6 @@ export function useWebRTC(options: UseWebRTCOptions) {
     addIceCandidate,
     replaceVideoTrack,
     close,
+    reset,
   };
 }
