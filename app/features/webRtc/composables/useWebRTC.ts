@@ -89,7 +89,7 @@ export function useWebRTC(options: UseWebRTCOptions) {
           break;
 
         case 'disconnected':
-          alert('[ICE] ⚠️ Disconnected (may recover)');
+          // alert('[ICE] ⚠️ Disconnected (may recover)');
           break;
       }
     };
@@ -126,9 +126,9 @@ export function useWebRTC(options: UseWebRTCOptions) {
         options.onNeedReconnect();
       } else {
         // Если callback не передан — показываем alert
-        alert(
-          '⚠️ Прямое соединение не удалось.\n\n' + 'Переподключение через TURN сервер...\n' + 'Пожалуйста, подождите.'
-        );
+        // alert(
+        //   '⚠️ Прямое соединение не удалось.\n\n' + 'Переподключение через TURN сервер...\n' + 'Пожалуйста, подождите.'
+        // );
       }
     } else {
       // Даже с TURN не работает

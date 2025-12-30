@@ -84,7 +84,7 @@ export function useMediaStream() {
     if (!videoTrack) return;
 
     const settings = videoTrack.getSettings();
-    const newFacingMode = settings.facingMode === 'user' ? 'environment' : 'user';
+    const newFacingMode: 'user' | 'environment' = settings.facingMode === 'user' ? 'environment' : 'user';
 
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({
@@ -98,7 +98,7 @@ export function useMediaStream() {
       localStream.value.addTrack(newVideoTrack);
       videoTrack.stop();
 
-      return newVideoTrack;
+      return { newVideoTrack, newFacingMode };
     } catch (err) {
       console.error('Failed to switch camera:', err);
     }

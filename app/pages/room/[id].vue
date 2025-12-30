@@ -67,7 +67,9 @@
             playsinline
             muted
             class="w-full h-full object-cover"
-            style="transform: scaleX(-1)"
+            :style="{
+              transform: cameraMode === 'user' ? 'scaleX(-1)' : 'none',
+            }"
           />
 
           <!-- Video Off Overlay -->
@@ -210,6 +212,7 @@ const remoteVideoEl = ref<HTMLVideoElement>();
 const hasJoined = ref(false);
 const userName = ref('User' + Math.floor(Math.random() * 1000));
 const hasRemoteVideo = ref(false);
+const cameraMode = ref<'user' | 'environment'>('user');
 
 // Media Stream
 const { error, isLoading, startMedia, toggleAudio, toggleVideo, localStream, isVideoOn, isAudiOn, switchCamera } =
@@ -316,11 +319,14 @@ async function reconnect() {
 
 async function handleSwitchCamera() {
   try {
-    const newVideoTrack = await switchCamera();
+    const cameraSettings = await switchCamera();
 
-    if (newVideoTrack && webrtc.peerConnection.value) {
+    cameraMode.value = cameraSettings?.newFacingMode ?? 'user';
+    console.log(cameraMode.value);
+
+    if (cameraSettings?.newVideoTrack && webrtc.peerConnection.value) {
       // Replace the track in the WebRTC connection
-      await webrtc.replaceVideoTrack(newVideoTrack);
+      await webrtc.replaceVideoTrack(cameraSettings.newVideoTrack);
 
       // Update local video element
       if (localVideoEl.value && localStream.value) {
