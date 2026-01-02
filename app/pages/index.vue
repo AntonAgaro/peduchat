@@ -3,7 +3,7 @@
     <div class="text-4xl font-bold mb-3 text-white mb-2">PeduChat</div>
     <h1 class="text-center text-white mb-8">Бесплатные видео звонки на двоих без регистрации.</h1>
     <h2 class="text-center mb-6">Создай комнату и отправь ссылку собеседнику:</h2>
-    <NuxtLink :to="`/room/${generateRoomId()}`">
+    <NuxtLink :to="roomId">
       <button
         class="mb-8 cursor-pointer btn-cta px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-3 min-w-[220px] justify-center text-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-transform duration-200"
         :style="{
@@ -61,6 +61,8 @@ const formState = reactive({
   roomCredentials: '',
 });
 type Schema = typeof formState;
+
+const roomId = useState('room-id', () => `/room/${generateRoomId()}`);
 
 const isLoading = ref(false);
 const error = ref('');

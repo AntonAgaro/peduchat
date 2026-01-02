@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     process.env.APP_ENV === 'dev' ? '@nuxt/eslint' : '',
     '@nuxt/ui',
     '@vite-pwa/nuxt',
+    '@artmizu/nuxt-prometheus',
     process.env.APP_ENV === 'dev' ? '@nuxt/test-utils' : '',
   ],
   css: ['~/assets/css/main.css'],
@@ -15,7 +16,6 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
-    '/': { swr: 60 * 5 },
     '/room/**': { ssr: false },
   },
   pwa: {
